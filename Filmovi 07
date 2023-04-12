@@ -1,0 +1,187 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _07_Filmovi
+{
+    public class PogledaniFilm
+    {
+        public int IdFilma { get; set; }
+
+        public int TrenutnaMinuta { get; set; }
+
+        public PogledaniFilm(int idFilma, int trenutnaMinuta)
+        {
+            IdFilma = idFilma;
+            TrenutnaMinuta = trenutnaMinuta;
+        }
+
+
+
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _07_Filmovi
+{
+    public class PovijestGledanja
+    {
+        public List<PogledaniFilm> pogledaniFilmovi;
+
+        public PovijestGledanja()
+        {
+            pogledaniFilmovi = new List<PogledaniFilm>();
+            pogledaniFilmovi.Add(new PogledaniFilm(1, 90));
+            pogledaniFilmovi.Add(new PogledaniFilm(2, 70));
+            pogledaniFilmovi.Add(new PogledaniFilm(5, 55));
+
+        }
+
+        public List<PogledaniFilm> DohvatiPogledaneFilmove()
+        {
+            return pogledaniFilmovi;
+        }
+
+
+
+
+
+    }
+}
+
+namespace _07_Filmovi
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _07_Filmovi
+{
+    public class StreamingServis
+    {
+        public List<Film> DohvatiZapoceteFilmove()
+        {
+            KatalogFilmova katalogFilmova = new KatalogFilmova();
+            PovijestGledanja povijest = new PovijestGledanja();
+
+            List <Film> zapocetiFilmovi = new List<Film> ();
+
+            foreach (Film film in katalogFilmova.DohvatiSveFilmove())
+            {
+                foreach (PogledaniFilm pogledaniFilm in povijest.DohvatiPogledaneFilmove())
+                {
+                    if (film.ID == pogledaniFilm.IdFilma && pogledaniFilm.TrenutnaMinuta < film.Trajanje)
+                    {
+                        zapocetiFilmovi.Add (film);
+                    }
+                }
+            }
+            return zapocetiFilmovi;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _07_Filmovi
+{
+    public class Film
+    {
+
+        public int ID { get; set; }
+
+        public string Naziv { get; set; }
+
+        public int Trajanje { get; set; }
+
+        public Film(int id, string naziv, int trajanje)
+        {
+            ID = id;
+            Naziv = naziv;
+            Trajanje = trajanje;
+        }
+
+    }
+}
+
+namespace _07_Filmovi
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        
+        public void PrikaziFilmove(List<Film> zapocetiFilmovi)
+        {
+            dgvZapocetiFilmovi.DataSource = zapocetiFilmovi;
+            
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            StreamingServis streamingServis = new StreamingServis();
+            PrikaziFilmove(streamingServis.DohvatiZapoceteFilmove());
+           
+           
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _07_Filmovi
+{
+    public class KatalogFilmova
+    {
+        public List<Film> sviFilmovi { get; set; }
+
+        public KatalogFilmova()
+        {
+            sviFilmovi = new List<Film>();
+            sviFilmovi.Add(new Film(1, "Batman", 90));
+            sviFilmovi.Add(new Film(2, "Superman", 85));
+            sviFilmovi.Add(new Film(3, "Spiderman", 98));
+            sviFilmovi.Add(new Film(4, "Ironman", 110));
+            sviFilmovi.Add(new Film(5, "Hulk", 115));
+
+        }
+        public List<Film> DohvatiSveFilmove()
+        {
+            return sviFilmovi;
+        }
+    }
+}
