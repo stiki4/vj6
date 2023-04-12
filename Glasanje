@@ -1,0 +1,115 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace glasanje_vjezba6
+{
+    public partial class GlasanjeForm : Form
+    {
+        private Glasanje glasanje = new Glasanje();
+        public GlasanjeForm()
+        {
+            InitializeComponent();
+            uxCbOpcija.Items.AddRange(new string[] { "ZA","PROTIV","SUZDRŽAN"});
+        }
+
+        private void uxBtnGlasaj_Click(object sender, EventArgs e)
+        {
+            if (glasanje.MozeGlasati(uxTbOIB.Text))
+            {
+                glasanje.Glasaj(uxTbOIB.Text, uxCbOpcija.Text);
+                Osvjezi();
+            }
+            else
+            {
+                MessageBox.Show("Nemate pravo glasati.");
+            }
+        }
+        private void Osvjezi()
+        {
+            uxLblProtiv.Text = glasanje.ProtivOpcija.ToString();
+            uxLblSuzdrzan.Text = glasanje.SuzdrzanOpcija.ToString();
+            uxLblZa.Text = glasanje.ZaOpcija.ToString();
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace glasanje_vjezba6
+{
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new GlasanjeForm());
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BiraciLib;
+namespace glasanje_vjezba6
+{
+    public class Glasanje
+    {
+        public int ZaOpcija = 0;
+        public int ProtivOpcija = 0;
+        public int SuzdrzanOpcija = 0;
+        public PopisBiraca popis = new PopisBiraca();
+        public List<string> vecGlasao = new List<string>();
+        public bool MozeGlasati(string oib)
+        {
+            if (popis.PostojiBirac(oib))
+            {
+                return NijeGlasao(oib);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool NijeGlasao(string oib)
+        {
+            return !vecGlasao.Contains(oib);
+        }
+
+        public void Glasaj(string oib, string opcija)
+        {
+            vecGlasao.Add(oib);
+            switch (opcija)
+            {
+                case "ZA":
+                    ZaOpcija++;
+                    break;
+                case "PROTIV":
+                    ProtivOpcija++;
+                    break;
+                case "SUZDRZAN":
+                    SuzdrzanOpcija++;
+                    break;
+            }
+        }
+
+    }
+}
