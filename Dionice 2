@@ -1,0 +1,116 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dionice2Ponovoo
+{
+    public class Stock
+    {
+        public string Name { get; set; }
+        public int Amount { get; set; }
+        public double Price { get; set; }
+        public double Worth { get; set; }
+        public Stock(string name,int amount,double price)
+        {
+            Name = name;
+            Amount = amount;
+            Price = price/100;
+            Worth = amount * price/100;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using StocksLib;
+namespace Dionice2Ponovoo
+{
+    public class StockPortfolio
+    {
+       public List<Stock> stocks = new List<Stock>();
+        public List<string> ownedStocksData = StockExchangeAPI.GetOwnedStocksData();
+        public List<Stock> GetMyStocks()
+        { 
+            return stocks;
+        }
+
+
+        public StockPortfolio()
+        {
+            foreach (var item in ownedStocksData)
+            {
+               string[] ime = item.Split(';');
+               double price= StockExchangeAPI.GetStockPrice(ime[0]);
+               Stock stock = new Stock(ime[0],int.Parse(ime[1]),price);
+               stocks.Add(stock);
+            }
+        }
+        
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Dionice2Ponovoo
+{
+    public partial class Stocks_Form : Form
+    {
+        public Stocks_Form()
+        {
+            InitializeComponent();
+        }
+       
+        private void buttonShowPortfolio_Click(object sender, EventArgs e)
+        {
+            StockPortfolio portfolio = new StockPortfolio();
+            List<Stock> stocks = new List<Stock>();
+            stocks=portfolio.GetMyStocks();
+            DisplayData(stocks);
+            double total = 0;
+            foreach (var item in stocks)
+            {
+                total = total + item.Worth;
+            }
+            textBox1.Text = total.ToString();
+        }
+
+        public void DisplayData(List<Stock> stocks)
+        {
+            dataGridView1.DataSource = stocks;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Dionice2Ponovoo
+{
+    class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Stocks_Form());
+        }
+    }
+}
