@@ -1,0 +1,125 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TecajnaLista
+{
+    public class ExchangeRate
+    {
+        public string CurrencyName { get; set; }
+        public double Rate { get; set; }
+        public ExchangeRate(string currencyName, double rate)
+        {
+            CurrencyName = currencyName;
+            Rate = rate;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace TecajnaLista
+{
+    public partial class ExchangeRates : Form
+    {
+        public ExchangeRates()
+        {
+            InitializeComponent();
+        }
+
+        private void buttonShowRates_Click(object sender, EventArgs e)
+        {
+            Exchange exchange = new Exchange();
+            List<ExchangeRate> rates= exchange.GetExchangeRates();
+            ShowExchangeRates(rates);
+        }
+        private void ShowExchangeRates(List<ExchangeRate> rates)
+        {
+            dataGridViewExchangeRates.DataSource = rates;
+        }
+        private void ExchangeRates_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+namespace TecajnaLista
+{
+    class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new ExchangeRates());
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BankLib;
+namespace TecajnaLista
+{
+    public class Exchange
+    {
+        public List<ExchangeRate> rates = new List<ExchangeRate>();
+        public List<ExchangeRate> GetExchangeRates()
+        {
+            List<string> exchangeData = BankAPI.GetExchangeData();
+            foreach (var item in exchangeData)
+            {
+                ExchangeParser parser = new ExchangeParser();
+                ExchangeRate exchangeRate = parser.ParseRate(item);
+                rates.Add(exchangeRate);
+            }
+            return rates;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TecajnaLista
+{
+    public class ExchangeParser
+    {
+        public ExchangeRate ParseRate(string item)
+        {
+            string[] polje = item.Split(';');
+            double broj = double.Parse(polje[1].Replace('.', ','));
+            string znakovi = broj.ToString();
+            if(znakovi.Length>1)
+            {
+                broj = broj / 10;
+            }
+            ExchangeRate exchangeRate = new ExchangeRate(polje[0],broj);
+            return exchangeRate;
+        }
+    }
+}
