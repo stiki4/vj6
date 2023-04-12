@@ -1,0 +1,131 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using StocksLib;
+
+namespace Stocks
+{
+    class StockManager
+    {
+        List<string> stocksData = StockExchangeAPI.GetStocksData();
+                
+        public List<Stock> GetStocks()
+        {
+            List<Stock> stocks = new List<Stock>();
+            foreach (var item in stocksData)
+            {
+                Stock stock = StockParser.ParseStock(item);
+                stocks.Add(stock);                
+            }
+            return stocks;
+        }
+
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Stocks
+{
+    static class StockParser
+    {
+        public static Stock ParseStock(string data)
+        {
+            string[] array = data.Split(';');
+            string name = array[0];
+            double currentPrice = double.Parse(array[1]);
+            double previousPrice = double.Parse(array[2]);            
+            Stock stock = new Stock(name, currentPrice, previousPrice);
+            return stock;
+        }
+        
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using StocksLib;
+
+namespace Stocks
+{
+    public partial class StocksForm : Form
+    {
+        public StocksForm()
+        {
+            InitializeComponent();
+        }
+        StockManager stockManager = new StockManager();
+        
+        private void btnShowStocks_Click(object sender, EventArgs e)
+        {
+            List<Stock> stocks = stockManager.GetStocks();
+            ShowData(stocks);
+        }
+
+        private void ShowData(List<Stock> stocks)
+        {
+            dgvStocks.DataSource = stocks;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Stocks
+{
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new StocksForm());
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Stocks
+{
+    class Stock
+    {
+        public string Name { get; set; }
+        public double CurrentPrice { get; set; }
+        public double PreviousPrice { get; set; }
+        public double Difference { get; set; }
+        public Stock(string name, double currentPrice, double previousPrice)
+        {
+            Name = name;
+            CurrentPrice = currentPrice;
+            PreviousPrice = previousPrice;
+            Difference = Math.Round(((currentPrice - previousPrice) / previousPrice) * 100, 2);
+        }
+    }
+}
