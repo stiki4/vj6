@@ -1,0 +1,167 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace PopisArtikala_vjezba6
+{
+    public partial class DodajArtikl : Form
+    {
+        private GlavnaForma glavna;
+        public DodajArtikl(GlavnaForma gl)
+        {
+            InitializeComponent();
+            glavna = gl;
+        }
+
+        private void uxBtnDodajSliku_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            pictureBox1.ImageLocation = openFileDialog1.FileName;
+        }
+
+        private void uxBtnDodajArtikl_Click(object sender, EventArgs e)
+        {
+            Artikl noviArtikl = new Artikl(uxTbNaziv.Text,int.Parse(uxTbKolicina.Text),double.Parse(uxTbCijena.Text),openFileDialog1.FileName);
+            Artikl.PopisArtikala.Add(noviArtikl);
+            Artikl.PopisArtikala.Sort((x,y)=>x.Cijena.CompareTo(y.Cijena));
+            glavna.Osvjezi();
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace PopisArtikala_vjezba6
+{
+    public partial class GlavnaForma : Form
+    {
+        public GlavnaForma()
+        {
+            InitializeComponent();
+        }
+
+        private void uxBtnDodaj_Click(object sender, EventArgs e)
+        {
+            DodajArtikl dodajForma = new DodajArtikl(this);
+            dodajForma.Show();
+           
+        }
+        public void Osvjezi()
+        {
+            double zbroj = 0;
+            flowLayoutPanel1.Controls.Clear();
+            foreach(Artikl x in Artikl.PopisArtikala)
+            {
+                ArtiklKontrola ar = new ArtiklKontrola(x,this);
+                ar.PostaviKontrolu();
+                flowLayoutPanel1.Controls.Add(ar);
+                zbroj += x.Kolicina * x.Cijena;
+            }
+            uxLblUkupanBroj.Text = zbroj.ToString();
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace PopisArtikala_vjezba6
+{
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new GlavnaForma());
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PopisArtikala_vjezba6
+{
+    public class Artikl
+    {
+        static public List<Artikl> PopisArtikala = new List<Artikl>();
+        public string Naziv { get; set; }
+        public int Kolicina { get; set; }
+        public double Cijena { get; set; }
+
+        public string Fotografija { get; set; }
+
+        public Artikl(string naziv, int kolicina, double cijena, string foto)
+        {
+            Naziv = naziv;
+            Kolicina = kolicina;
+            Cijena = cijena;
+            Fotografija = foto;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace PopisArtikala_vjezba6
+{
+    public partial class ArtiklKontrola : UserControl
+    {
+        public Artikl ArtiklProp { get; set; }
+        private GlavnaForma glavna;
+        public ArtiklKontrola(Artikl ar,GlavnaForma gl)
+        {
+            InitializeComponent();
+            ArtiklProp = ar;
+            glavna = gl;
+        }
+        public void PostaviKontrolu()
+        {
+            uxLblNaziv.Text = ArtiklProp.Naziv;
+            uxLblKolicina.Text = ArtiklProp.Kolicina.ToString();
+            uxLblCijena.Text = ArtiklProp.Cijena.ToString();
+            pictureBox1.ImageLocation = ArtiklProp.Fotografija;
+        }
+
+        private void uxBtnObrisi_Click(object sender, EventArgs e)
+        {
+            Artikl.PopisArtikala.Remove(ArtiklProp);
+            glavna.Osvjezi();
+        }
+    }
+}
+
+
