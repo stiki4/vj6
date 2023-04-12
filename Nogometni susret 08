@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _08_Nogometni_susret
+{
+    public class Repozitorij
+    {
+        public List<Reprezentacija> ListaReprezentacija { get; set; }
+
+        public Repozitorij()
+        {
+            ListaReprezentacija = new List<Reprezentacija>();
+            ListaReprezentacija.Add(new Reprezentacija("HRV", "Hrvatska"));
+            ListaReprezentacija.Add(new Reprezentacija("GER", "Njemačka"));
+            ListaReprezentacija.Add(new Reprezentacija("FRA", "Francuska"));
+        }
+
+        public Reprezentacija DohvatiReprezentaciju(string oznaka)
+        {
+            foreach (Reprezentacija reprezentacija in ListaReprezentacija)
+            {
+                if(oznaka == reprezentacija.Oznaka)
+                {
+                    return reprezentacija;
+                }
+            }
+            return null;
+        }
+
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _08_Nogometni_susret
+{
+    public class Reprezentacija
+    {
+        public string Oznaka { get; set; }
+
+        public string Naziv { get; set; }
+
+        public Reprezentacija(string oznaka, string naziv)
+        {
+            Oznaka = oznaka;
+            Naziv = naziv;
+        }
+
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _08_Nogometni_susret
+{
+   public class Susret
+    {
+        public Reprezentacija Domacin { get; set; }
+
+        public int BrojPogodakaDomacin { get; set; }
+
+        public Reprezentacija Gost { get; set; }
+
+        public int BrojPogodakaGost {get; set; }
+
+        public Susret(Reprezentacija domacin, int brojPogodakaDomacin, Reprezentacija gost, int brojPogodakaGost)
+        {
+            Domacin = domacin;
+            BrojPogodakaDomacin = brojPogodakaDomacin;
+            Gost = gost;
+            BrojPogodakaGost = brojPogodakaGost;
+        }
+
+
+    }
+}
+
+namespace _08_Nogometni_susret
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnEvidentiraj_Click(object sender, EventArgs e)
+        {
+            KontrolaSusreta kontrola = new KontrolaSusreta();
+
+            Susret susret = kontrola.EvidentirajSusret(tbDomacin.Text, tbGost.Text, tbRezultat.Text);
+
+            MessageBox.Show(susret.Domacin.Naziv + " " + susret.BrojPogodakaDomacin.ToString() + ":" + susret.BrojPogodakaGost.ToString() + " " + susret.Gost.Naziv);
+                
+
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _08_Nogometni_susret
+{
+    public class KontrolaSusreta
+    {
+        public Susret EvidentirajSusret(string oznakaDomacin, string oznakaGost, string rezultat)
+        {
+            Repozitorij repozitorij = new Repozitorij();
+            Reprezentacija domacin = repozitorij.DohvatiReprezentaciju(oznakaDomacin);
+            Reprezentacija gost = repozitorij.DohvatiReprezentaciju(oznakaGost);
+
+            string[] rez = rezultat.Split(':');
+            int brojPogodakaDomacin = int.Parse(rez[0]);
+            int brojPogodakaGost = int.Parse(rez[1]);
+
+            Susret susret = new Susret(domacin, brojPogodakaDomacin, gost, brojPogodakaGost);
+
+            return susret;
+
+        }
+
+    }
+}
+
+namespace _08_Nogometni_susret
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
+        }
+    }
+}
