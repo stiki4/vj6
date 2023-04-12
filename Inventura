@@ -1,0 +1,127 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using InventoryLib;
+namespace Inventura
+{
+    public class InventoryList
+    {
+        public List<string> entries { get; set; }
+        public static List<InventoryItem> List { get; set; } = new List<InventoryItem>();
+        public InventoryList()
+        {
+            LoadItems();
+        }
+        public void LoadItems()
+        {
+            Scanner scanner = new Scanner();
+            entries = scanner.GetEntries();
+            foreach (var item in entries)
+            {
+                string[] razdvoji = item.Split(';');
+                int id = int.Parse(razdvoji[0]);
+                string name = razdvoji[1];
+                InventoryItem inventoryItem = new InventoryItem(id,name);
+                AddItem(inventoryItem);
+            }
+
+        }
+        private void AddItem(InventoryItem item)
+        {
+            bool sadrzi = false;
+            foreach (var slog in List)
+            {
+                if (slog.Id == item.Id)
+                {
+                    slog.Count++;
+                    sadrzi = true;
+                }
+            }
+            if (sadrzi == false) List.Add(item);
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Inventura
+{
+    public partial class InventoryReport : Form
+    {
+        public InventoryReport()
+        {
+            InitializeComponent();
+            InventoryList inventoryList = new InventoryList();
+        }
+  
+        private void button1_Click(object sender, EventArgs e)
+        {
+            PrintList(InventoryList.List);
+        }
+        public void PrintList(List<InventoryItem> lista)
+        {
+            textBox1.Text += "INVENTORY LIST:" + Environment.NewLine;
+            textBox1.Text += "----------------------------------------" + Environment.NewLine;
+
+            foreach (var item in lista)
+            {
+                string report = "Id=" + item.Id + ", Name" + item.Name + ", Count=" + item.Count+Environment.NewLine;
+                textBox1.Text += report;
+            }
+        }
+
+   
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+namespace Inventura
+{
+    class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new InventoryReport());
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Inventura
+{
+    public class InventoryItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Count { get; set; }
+        public InventoryItem(int id,string name)
+        {
+            Id = id;
+            Name = name;
+            Count = 1;
+        }
+    }
+}
