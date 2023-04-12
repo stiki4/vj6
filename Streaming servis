@@ -1,0 +1,175 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _16_streaming_servis
+{
+    public class KatalogFilmova
+    {
+
+        public List<Film> ListaFilmova { get; set; }
+
+        public List<PogledaniFilm> ListaPogledanihFilmova = new List<PogledaniFilm>();
+
+        public KatalogFilmova()
+        {
+            ListaFilmova = new List<Film>();
+            ListaFilmova.Add(new Film(1, "Batman"));
+            ListaFilmova.Add(new Film(2, "Superman"));
+            ListaFilmova.Add(new Film(3, "Spiderman"));
+            ListaFilmova.Add(new Film(4, "Ironman"));
+            ListaFilmova.Add(new Film(5, "Hulk"));
+        }
+
+        public List<Film> DohvatiSveFilmove()
+        {
+            return ListaFilmova;
+        }
+
+        public List<PogledaniFilm> DohvatiPogledaneFilmove()
+        {
+            return ListaPogledanihFilmova;
+        }
+
+        public void DodajPogledaniFilm (PogledaniFilm noviPogledaniFilm)
+        {
+            ListaPogledanihFilmova.Add(noviPogledaniFilm);
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _16_streaming_servis
+{
+    public class PogledaniFilm
+    {
+        public int idFilma { get; set; }
+
+        public DateTime DatumGledanja { get; set; }
+
+        public PogledaniFilm(int idfilma)
+        {
+            idFilma = idfilma;
+        }
+    }
+}
+
+namespace _16_streaming_servis
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _16_streaming_servis
+{
+    public class StreamingServis
+    {
+        public KatalogFilmova katalogFilmova = new KatalogFilmova();
+
+        public List<Film> DohvatiNeodgledaneFilmove()
+        {
+            
+            List<Film> neodgledaniFilmovi = new List<Film>();
+
+
+            foreach (var item in katalogFilmova.DohvatiSveFilmove())
+            {
+                bool pogledan = false;
+
+                foreach (var item2 in katalogFilmova.DohvatiPogledaneFilmove())
+                {
+                    if (item.ID == item2.idFilma)
+                    {
+                        pogledan = true;
+                    }
+                  
+                }
+                if (pogledan == false)
+                {
+                    neodgledaniFilmovi.Add(item);
+                }
+            }
+
+            return neodgledaniFilmovi;
+        }
+
+        public void PogledajFilm (Film odabraniFilm)
+        {
+            PogledaniFilm noviPogledaniFilm = new PogledaniFilm(odabraniFilm.ID);
+            katalogFilmova.DodajPogledaniFilm(noviPogledaniFilm);
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _16_streaming_servis
+{
+    public class Film
+    {
+        public int ID { get; set; }
+
+        public string Naziv { get; set; }
+
+        public Film(int id, string naziv)
+        {
+            ID = id;
+            Naziv = naziv;
+        }
+                    
+
+    }
+}
+
+namespace _16_streaming_servis
+{
+    public partial class Form1 : Form
+    {
+        public StreamingServis servis = new StreamingServis();
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnOsvjezi_Click(object sender, EventArgs e)
+        {
+            dgvNeodgledaniFilmovi.DataSource = null;
+            dgvNeodgledaniFilmovi.DataSource = servis.DohvatiNeodgledaneFilmove();
+        }
+
+        private void btnPogledajFilm_Click(object sender, EventArgs e)
+        {
+            Film odabraniFilm = dgvNeodgledaniFilmovi.CurrentRow.DataBoundItem as Film;
+            servis.PogledajFilm(odabraniFilm);
+        }
+    }
+}
