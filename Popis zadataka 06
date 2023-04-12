@@ -1,0 +1,126 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _06_Popis_Zadataka
+{
+    public class GeneratorZadataka
+    {
+        public List<Zadatak> PopisZadataka = new List<Zadatak>();
+
+        public void DodajZadatak (string naziv, DateTime krajnjirok)
+        {
+            PopisZadataka.Add (new Zadatak (naziv, krajnjirok));
+
+        }
+
+        /*public void Sortiraj()      SORTIRANJE PO ROKU
+        {
+            PopisZadataka.Sort((x, y) => x.KrajnjiRok.CompareTo(y.KrajnjiRok));
+        }*/
+
+        public void SortirajPoAbecedi()
+        {
+            PopisZadataka.Sort((x,y) => x.Naziv.CompareTo(y.Naziv));  //SORTIRANJE PO NAZIVU
+        }
+
+        public DateTime DohvatiDatumiVrijeme()
+        {
+            return DateTime.Now;
+        }
+
+       public bool Oboji (Zadatak zadatak)
+        {
+            if (zadatak.KrajnjiRok < DateTime.Now)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
+    }
+}
+
+namespace _06_Popis_Zadataka
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _06_Popis_Zadataka
+{
+    public class Zadatak
+    {
+        public string Naziv { get; set; }
+
+        public DateTime KrajnjiRok { get; set;}
+
+        public Zadatak(string naziv, DateTime krajnjiRok)
+        {
+            Naziv = naziv;
+            KrajnjiRok = krajnjiRok;
+        }
+    }
+}
+
+namespace _06_Popis_Zadataka
+{
+    public partial class Form1 : Form
+    {
+        GeneratorZadataka generator = new GeneratorZadataka();
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnDodajZadatak_Click(object sender, EventArgs e)
+        {
+            string naziv = tbNazivZadatka.Text;
+            DateTime krajnjirok = dtpKrajnjiRok.Value;
+
+            generator.DodajZadatak(naziv, krajnjirok);
+
+            OsvjeziPopis();
+
+        }
+
+        public void OsvjeziPopis()
+        {
+            dgvPopisZadataka.DataSource = null;
+            dgvPopisZadataka.DataSource = generator.PopisZadataka;
+
+            foreach (DataGridViewRow row in dgvPopisZadataka.Rows) { 
+            
+                Zadatak zadatak = row.DataBoundItem as Zadatak;
+
+                if (zadatak.KrajnjiRok < generator.DohvatiDatumiVrijeme())
+                {
+                    row.DefaultCellStyle.BackColor = Color.Red;
+                }
+            }
+
+            generator.SortirajPoAbecedi();
+        }
+    }
+}
