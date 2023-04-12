@@ -1,0 +1,167 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _14_Registracija
+{
+    public class Korisnik
+    {
+        public Korisnik(string ime, string prezime, string email, string lozinka)
+        {
+            Ime = ime;
+            Prezime = prezime;
+            Email = email;
+            Lozinka = lozinka;
+        }
+
+        public string Ime { get; set; }
+
+        public string Prezime { get; set; }
+
+        public string Email { get; set; }
+
+        public string Lozinka { get; set; }
+
+
+
+
+    }
+}
+
+namespace _14_Registracija
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _14_Registracija
+{
+    public class Registrator
+    {
+        public bool Registriraj (string ime, string prezime)
+        {
+            Generator generator = new Generator();
+            string email = generator.GenerirajEmail(ime, prezime);
+            string lozinka = generator.GenerirajLozinku();
+            Korisnik noviKorisnik = new Korisnik(ime, prezime, email, lozinka);
+
+
+            if (Repozitorij.DodajKorisnika(noviKorisnik))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            
+
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _14_Registracija
+{
+    public static class Repozitorij {
+
+        public static List<Korisnik> ListaKorisnika = new List<Korisnik>();
+
+
+        public static bool DodajKorisnika(Korisnik noviKorisnik)
+        {
+            bool dodan = true;
+
+            foreach (Korisnik korisnik in ListaKorisnika)
+            {
+                if (korisnik.Ime == noviKorisnik.Ime && korisnik.Prezime == noviKorisnik.Prezime)
+                {
+                    dodan = false;
+                    break;
+                }
+            
+            }
+            if (dodan == true)
+            {
+                ListaKorisnika.Add(noviKorisnik);
+            }
+
+            return dodan;
+            
+        }
+    }
+}
+
+namespace _14_Registracija
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnRegistriraj_Click(object sender, EventArgs e)
+        {
+            Registrator registrator = new();
+
+            if (registrator.Registriraj(tbIme.Text, tbPrezime.Text) == true)
+            {
+                MessageBox.Show("Korisnik je uspješno dodan!");
+            }
+            else
+            {
+                MessageBox.Show("Korisnik već postoji!");
+            }
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _14_Registracija
+{
+   public class Generator
+    {
+        public string GenerirajEmail(string ime, string prezime)
+        {
+            string email = ime.Substring (0,1) + prezime.Substring (0,5) + "@foi.hr";
+            return email;
+        }
+
+        public string GenerirajLozinku()
+        {
+            Random r = new Random();
+            string lozinka = r.Next (1000, 9999).ToString();
+
+            return lozinka;
+        }
+    }
+}
