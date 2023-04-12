@@ -1,1 +1,216 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
+namespace _01_Sigurnosna_vrata
+{
+    public class Repozitorij
+    {
+        public List<Korisnik> ListaKorisnika;
+
+        public List<Vrata> ListaVrata;
+
+        public Repozitorij()
+        {
+            ListaKorisnika = new List<Korisnik>();
+            ListaVrata = new List<Vrata>();
+            ListaKorisnika.Add(new Korisnik(10001, 1234, 1));
+            ListaKorisnika.Add(new Korisnik(10002, 0000, 2));
+            ListaKorisnika.Add(new Korisnik(10003, 9999, 2));
+
+            ListaVrata.Add(new Vrata(501, 1));
+            ListaVrata.Add(new Vrata(502, 2));
+            ListaVrata.Add(new Vrata(503, 2));
+        }
+        public Korisnik DohvatiKorisnika(int brKartice, int pin)
+        {
+            foreach(Korisnik korisnik in ListaKorisnika)
+            {
+                if (korisnik.BrojKartice == brKartice && korisnik.PIN == pin)
+                {
+                    return korisnik;
+                }
+            }   
+            return null;
+        }
+        
+        public Vrata DohvatiVrata (int brVrata)
+        {
+            foreach (Vrata vrata in ListaVrata)
+            {
+                if (vrata.BrojVrata == brVrata)
+                {
+                    return vrata;
+                }
+            }
+            return null;
+        }
+
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _01_Sigurnosna_vrata
+{
+    public class SigurnosnaKontrola
+    {
+        public bool OtvoriVrata(int brKartice, int pin, int brVrata)
+        {
+            Repozitorij repozitorij = new Repozitorij();
+
+            bool otvoreno = false;
+
+            Korisnik korisnik = repozitorij.DohvatiKorisnika(brKartice, pin);
+
+            Vrata vrata = repozitorij.DohvatiVrata(brVrata);
+
+            if (korisnik.RazinaPrava == vrata.RazinaPrava)
+            {
+      
+                otvoreno = true;
+
+            } else if (korisnik.RazinaPrava == vrata.RazinaPrava && pin != korisnik.PIN)
+            {
+                otvoreno = false;
+            }
+
+            return otvoreno;
+        }
+    }
+
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _01_Sigurnosna_vrata
+{
+    public class Vrata
+    {
+        public int BrojVrata { get; set; }
+
+        public int RazinaPrava { get; set; }
+
+        public Vrata(int brojVrata, int razinaPrava)
+        {
+            BrojVrata = brojVrata;
+            RazinaPrava = razinaPrava;
+
+        }
+    }
+}
+
+namespace _01_Sigurnosna_vrata
+{
+    public partial class Form1 : Form
+    {
+        SigurnosnaKontrola sigurnosnaKontrola = new SigurnosnaKontrola();
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btn501_Click(object sender, EventArgs e)
+        {
+            int brKartice = int.Parse(tbBrojKartice.Text);
+            int pin = int.Parse (tbPIN.Text);
+            int brVrata = 501;
+
+            if (sigurnosnaKontrola.OtvoriVrata(brKartice, pin, brVrata)) {
+                MessageBox.Show("Vrata uspje�no otvorena!");
+            }
+
+            else
+            {
+                MessageBox.Show("Vrata neuspje�no otvorena");
+            }
+        }
+
+        private void btn502_Click(object sender, EventArgs e)
+        {
+            int brKartice = int.Parse(tbBrojKartice.Text);
+            int pin = int.Parse(tbPIN.Text);
+            int brVrata = 502;
+
+            if (sigurnosnaKontrola.OtvoriVrata(brKartice, pin, brVrata))
+            {
+                MessageBox.Show("Vrata uspje�no otvorena!");
+            }
+
+            else
+            {
+                MessageBox.Show("Vrata neuspje�no otvorena");
+            }
+        }
+
+        private void btn503_Click(object sender, EventArgs e)
+        {
+            int brKartice = int.Parse(tbBrojKartice.Text);
+            int pin = int.Parse(tbPIN.Text);
+            int brVrata = 503;
+
+            if (sigurnosnaKontrola.OtvoriVrata(brKartice, pin, brVrata))
+            {
+                MessageBox.Show("Vrata uspje�no otvorena!");
+            }
+            else
+            {
+                MessageBox.Show("Vrata neuspje�no otvorena");
+            }
+        }
+    }
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _01_Sigurnosna_vrata
+{
+    public class Korisnik
+    {
+
+        public int BrojKartice { get; set; }
+
+        public int PIN { get; set; }
+
+        public int RazinaPrava { get; set; }
+
+        public Korisnik(int brojKartice, int pin, int razinaPrava)
+        {
+            BrojKartice = brojKartice;
+            PIN = pin;
+            RazinaPrava = razinaPrava;
+        }
+
+    }
+}
+
+namespace _01_Sigurnosna_vrata
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
+        }
+    }
+}
