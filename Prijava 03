@@ -1,1 +1,147 @@
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _03_Prijava
+{
+    public class RepozitorijKorisnika
+    {
+        public List<Korisnik> ListaKorisnika { get; set; }
+
+        public RepozitorijKorisnika()
+        {
+            ListaKorisnika = new List<Korisnik>();
+            ListaKorisnika.Add(new Korisnik(1, "pperic"));
+            ListaKorisnika.Add(new Korisnik(2, "ihorvat"));
+        }
+        public Korisnik DohvatiKorisnika(string korIme)
+        {
+            foreach (Korisnik korisnik in ListaKorisnika)
+            {
+                if (korIme == korisnik.KorisnickoIme)
+                {
+                    return korisnik;
+                }
+            }
+            return null;
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _03_Prijava
+{
+    public class UpraviteljLozinkama
+    {
+        public List<string> ListaLozinki { get; set; }
+
+        public UpraviteljLozinkama()
+        {
+            ListaLozinki= new List<string>();
+            ListaLozinki.Add("1;abc111");
+            ListaLozinki.Add("2;abc222");
+        }
+
+        public string DohvatiLozinku(int idKorisnika)
+        {
+
+            foreach (string lozinka in ListaLozinki)
+            {
+                string[] splitano = lozinka.Split(';');
+
+                if (int.Parse(splitano[0]) == idKorisnika)
+                {
+                    return splitano[1];
+                }
+
+            }
+            return null;
+            
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _03_Prijava
+{
+    public class Autentifikator
+    {
+        public UpraviteljLozinkama upraviteljLozinkama = new UpraviteljLozinkama();
+
+        public bool PrijaviKorisnika(int idKorisnika, string lozinka)
+        {
+            bool podaciIspravni = false;
+            if (lozinka == upraviteljLozinkama.DohvatiLozinku(idKorisnika))
+            {
+                podaciIspravni = true;
+                return podaciIspravni;
+            }
+            else return podaciIspravni;
+           
+                
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _03_Prijava
+{
+    public class Korisnik
+    {
+
+        public int ID { get; set; }
+
+        public string KorisnickoIme { get; set; }
+
+        public Korisnik(int iD, string korisnickoIme)
+        {
+            ID = iD;
+            KorisnickoIme = korisnickoIme;
+        }
+
+
+    }
+}
+
+namespace _03_Prijava
+{
+    public partial class PrijavnaForma : Form
+    {
+        public PrijavnaForma()
+        {
+            InitializeComponent();
+        }
+
+        private void btnPrijava_Click(object sender, EventArgs e)
+        {
+            Autentifikator autentifikator = new Autentifikator();
+            RepozitorijKorisnika repozitorij = new RepozitorijKorisnika();
+
+            if (autentifikator.PrijaviKorisnika(repozitorij.DohvatiKorisnika(tbKorisnickoIme.Text).ID, tbLozinka.Text))
+            {
+                MessageBox.Show("Uspje�na prijava!");
+            }
+            else MessageBox.Show("Neuspje�na prijava!");
+
+
+        }
+    }
+}
